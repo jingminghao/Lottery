@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lottery.mapper.TLotteryMapper" >
+
+
+	<!--1.==========================================双色球主==========START======================================== -->
+	<resultMap id="DoubleColorMainResultMap" type="com.lottery.pojo.TLotteryDoubleColorBallMainBean" >
+		<result column="f_phase_num" property="fPhaseNum" />
+		<result column="f_phase_name" property="fPhaseName" />
+		<result column="f_red_one" property="fRedOne" />
+		<result column="f_red_two" property="fRedTwo" />
+		<result column="f_red_three" property="fRedThree" />
+		<result column="f_red_four" property="fRedFour" />
+		<result column="f_red_five" property="fRedFive" />
+		<result column="f_red_six" property="fRedSix" />
+		<result column="f_blue" property="fBlue" />
+		<result column="f_lottery_time" property="fLotteryTime" />
+		<result column="f_lottery_timne_week" property="fLotteryTimneWeek" />
+		<result column="f_sales" property="fSales" />
+		<result column="f_poolmoney" property="fPoolmoney" />
+		<result column="f_content" property="fContent" />
+		<result column="f_create_time" property="fCreateTime" />
+		<result column="f_balls" property="fBalls" />
+
+		<result column="rowno" property="rowno" />
+
+	</resultMap>
+
+
+	<sql id="DoubleColorMain_Column_List">
+                `f_phase_num`,
+                `f_phase_name`,
+                `f_red_one`,
+                `f_red_two`,
+                `f_red_three`,
+                `f_red_four`,
+                `f_red_five`,
+                `f_red_six`,
+                `f_blue`,
+                `f_balls`,
+                `f_lottery_time`,
+                `f_lottery_timne_week`,
+                `f_sales`,
+                `f_poolmoney`,
+                `f_content`,
+                `f_create_time`
+    </sql>
+
+
+
+	<insert id="addDoubleColorBallMain" useGeneratedKeys="true" keyColumn="id" parameterType="com.lottery.pojo.TLotteryDoubleColorBallMainBean">
+		REPLACE  INTO t_lottery_double_color_ball_main
+		(
+			`f_phase_num`,
+			`f_phase_name`,
+			`f_red_one`,
+			`f_red_two`,
+			`f_red_three`,
+			`f_red_four`,
+			`f_red_five`,
+			`f_red_six`,
+			`f_blue`,
+			`f_balls`,
+			`f_lottery_time`,
+			`f_lottery_timne_week`,
+			`f_sales`,
+			`f_poolmoney`,
+			`f_content`
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"  separator=",">
+			(
+			#{item.fPhaseNum},
+			#{item.fPhaseName},
+			#{item.fRedOne},
+			#{item.fRedTwo},
+			#{item.fRedThree},
+			#{item.fRedFour},
+			#{item.fRedFive},
+			#{item.fRedSix},
+			#{item.fBlue},
+			#{item.fBalls},
+			#{item.fLotteryTime},
+			#{item.fLotteryTimneWeek},
+			#{item.fSales},
+			#{item.fPoolmoney},
+			#{item.fContent}
+			)
+		</foreach>
+	</insert>
+
+
+	<select id="queryDoubleColorBallMainByPrimaryKey" resultMap="DoubleColorMainResultMap">
+		SELECT <include refid="DoubleColorMain_Column_List" />
+		FROM t_lottery_double_color_ball_main
+		WHERE `f_phase_num` = #{fPhaseNum}
+	</select>
+
+
+	<select id="queryLatestDoubleColorBallMain" resultMap="DoubleColorMainResultMap" >
+		SELECT <include refid="DoubleColorMain_Column_List" />
+		FROM t_lottery_double_color_ball_main
+		ORDER BY  DATE_FORMAT(f_lottery_time,"%Y%m%d") DESC
+		limit 0,1
+	</select>
+
+	<select id="queryDoubleColorBallPageTotal" resultType="java.lang.Integer">
+		SELECT COUNT(1)
+		FROM t_lottery_double_color_ball_main
+		WHERE 1=1
+		<if test="fPhaseNum !=null and fPhaseNum!='' ">
+			AND `f_phase_num` = #{fPhaseNum}
+		</if>
+
+		<if test="fBalls !=null and fBalls!='' ">
+			AND `f_balls` = #{fBalls}
+		</if>
+
+		<if test="fLotteryTimeStart !=null and fLotteryTimeStart!='' ">
+			AND  DATE_FORMAT(f_lottery_time,"%Y%m%d")  <![CDATA[ <=  ]]>  DATE_FORMAT(#{fLotteryTimeStart},"%Y%m%d")
+		</if>
+		<if test="fLotteryTimeEnd !=null and fLotteryTimeEnd!='' ">
+			AND DATE_FORMAT(#{fLotteryTimeEnd},"%Y%m%d")   <![CDATA[ >= ]]>  DATE_FORMAT(f_lottery_time,"%Y%m%d")
+		</if>
+	</select>
+
+
+	<select id="queryDoubleColorBallPageList" resultMap="DoubleColorMainResultMap">
+		SELECT
+		<include refid="DoubleColorMain_Column_List" />
+		FROM t_lottery_double_color_ball_main
+		WHERE 1=1
+		<if test="item.fPhaseNum !=null and item.fPhaseNum!='' ">
+			AND `f_phase_num` = #{item.fPhaseNum}
+		</if>
+		<if test="item.fBalls !=null and item.fBalls!='' ">
+			AND `f_balls` = #{item.fBalls}
+		</if>
+
+		<if test="item.fLotteryTimeStart !=null and item.fLotteryTimeStart!='' ">
+			AND  DATE_FORMAT(#{item.fLotteryTimeStart},"%Y%m%d")  <![CDATA[ <=  ]]> DATE_FORMAT(f_lottery_time,"%Y%m%d")
+		</if>
+		<if test="item.fLotteryTimeEnd !=null and item.fLotteryTimeEnd!='' ">
+			AND DATE_FORMAT(item.f_lottery_time,"%Y%m%d") <![CDATA[  >=    ]]>  DATE_FORMAT(#{fLotteryTimeEnd},"%Y%m%d")
+		</if>
+		ORDER BY  DATE_FORMAT(f_lottery_time,"%Y%m%d") DESC
+		LIMIT #{pager.start}, #{pager.pageSize}
+	</select>
+
+
+	<!--==========================================双色球主==========END======================================== -->
+
+
+
+
+	<!--2.==========================================双色球子==========START========================================-->
+	<resultMap id="DoubleColorBallInfoResultMap" type="com.lottery.pojo.TLotteryDoubleColorBallInfoBean" >
+		<result column="f_id" property="fId" />
+		<result column="f_phase_num" property="fPhaseNum" />
+		<result column="f_type" property="fType" />
+		<result column="f_type_money" property="fTypeMoney" />
+		<result column="f_type_num" property="fTypeNum" />
+		<result column="f_create_time" property="fCreateTime" />
+	</resultMap>
+
+	<sql id="DoubleColorBallInfo_Column_List">
+		`f_id`,
+		`f_phase_num`,
+		`f_type`,
+		`f_type_money`,
+		`f_type_num`,
+		`f_create_time`
+	</sql>
+
+	<insert id="addDoubleColorBallInfo" useGeneratedKeys="true" keyColumn="id" parameterType="com.lottery.pojo.TLotteryDoubleColorBallInfoBean">
+		REPLACE INTO t_lottery_double_color_ball_info
+		(
+		`f_id`,
+		`f_phase_num`,
+		`f_type`,
+		`f_type_money`,
+		`f_type_num`
+		)
+		VALUES
+		<foreach collection="list" item="item" index="index"  separator=",">
+			(
+				#{item.fId},
+				#{item.fPhaseNum},
+				#{item.fType},
+				#{item.fTypeMoney},
+				#{item.fTypeNum}
+			)
+		</foreach>
+	</insert>
+
+	<select id="queryDoubleColorBallInfoByfPhaseNum" resultMap="DoubleColorBallInfoResultMap">
+		SELECT
+		`f_id`,
+		`f_phase_num`,
+		`f_type`+0 as f_typeOrder,
+		CASE
+				WHEN f_type =1 THEN '一等奖'
+				WHEN f_type =2 THEN '二等奖'
+				WHEN f_type =3 THEN '三等奖'
+				WHEN f_type =4 THEN '四等奖'
+				WHEN f_type =5 THEN '五等奖'
+				WHEN f_type =6 THEN '六等奖'
+				WHEN f_type =7 THEN '七等奖'
+				ELSE
+					f_type
+			END  as f_type ,
+
+		`f_type_money`,
+		`f_type_num`,
+		`f_create_time`
+
+		FROM t_lottery_double_color_ball_info
+		WHERE `f_phase_num` = #{fPhaseNum}
+		order by f_typeOrder
+	</select>
+
+
+
+	<!--==========================================双色球子==========END======================================== -->
+
+	<!-- 预算 -->
+
+	<!-- 历史Count -->
+	<select id="queryDoubleHistoryCountByBallType" resultType="java.lang.Integer">
+		SELECT count(1)  FROM  t_lottery_double_color_ball_main 
+		WHERE 1=1 
+		<if test="startDate !=null || startDate !='' ">
+			AND DATE_FORMAT(f_lottery_time,"%Y%m%d") <![CDATA[ <= ]]> DATE_FORMAT(#{startDate},"%Y%m%d")
+		</if>
+		<if test="endDate !=null || endDate !='' ">
+			AND DATE_FORMAT(f_lottery_time,"%Y%m%d") <![CDATA[ >= ]]> DATE_FORMAT(#{endDate},"%Y%m%d")
+		</if>
+	</select>
+
+	<select id="queryDoubleHistoryDataByBallType" resultMap="DoubleColorMainResultMap">
+
+
+	</select>
+
+</mapper>
