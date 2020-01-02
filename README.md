@@ -1,1 +1,2 @@
 # Lottery
+master 1
